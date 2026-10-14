@@ -1,8 +1,12 @@
 // src/lib/userDb.js
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 
-const DATA_DIR = path.join(process.cwd(), '.data');
+// In serverless environments like Vercel, the project root is read-only (/var/task).
+// Only os.tmpdir() (/tmp) is writable.
+const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const DATA_DIR = isServerless ? os.tmpdir() : path.join(process.cwd(), '.data');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 
 // Default initial users
@@ -29,24 +33,35 @@ const DEFAULT_USERS = {
   },
 };
 
+// Global in-memory store
+let memoryUsers = { ...DEFAULT_USERS };
+
 function ensureDb() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
-  if (!fs.existsSync(USERS_FILE)) {
-    fs.writeFileSync(USERS_FILE, JSON.stringify(DEFAULT_USERS, null, 2), 'utf8');
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    if (!fs.existsSync(USERS_FILE)) {
+      fs.writeFileSync(USERS_FILE, JSON.stringify(DEFAULT_USERS, null, 2), 'utf8');
+    }
+  } catch (err) {
+    console.warn('Filesystem write notice, using in-memory store:', err.message);
   }
 }
 
 export function getAllUsers() {
   ensureDb();
   try {
-    const data = fs.readFileSync(USERS_FILE, 'utf8');
-    return JSON.parse(data);
+    if (fs.existsSync(USERS_FILE)) {
+      const data = fs.readFileSync(USERS_FILE, 'utf8');
+      const parsed = JSON.parse(data);
+      memoryUsers = { ...DEFAULT_USERS, ...parsed };
+      return memoryUsers;
+    }
   } catch (err) {
-    console.error('Failed to read users DB, using defaults:', err);
-    return { ...DEFAULT_USERS };
+    console.warn('Failed to read users file, using memory store:', err.message);
   }
+  return memoryUsers;
 }
 
 export function findUser(id) {
@@ -60,7 +75,6 @@ export function saveUser({ id, name, department, email, role, password }) {
     throw new Error('User ID and Name are required');
   }
 
-  ensureDb();
   const users = getAllUsers();
   const cleanId = id.trim().toUpperCase();
 
@@ -76,7 +90,14 @@ export function saveUser({ id, name, department, email, role, password }) {
   };
 
   users[cleanId] = newUser;
-  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf8');
+  memoryUsers = users;
+
+  try {
+    ensureDb();
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf8');
+  } catch (err) {
+    console.warn('Serverless storage fallback: saved user to in-memory store:', err.message);
+  }
 
   // Return user without sensitive password
   const safeUser = { ...newUser };
