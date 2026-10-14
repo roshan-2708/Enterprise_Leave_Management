@@ -1,0 +1,62 @@
+{
+  "EMP101": {
+    "id": "EMP101",
+    "name": "Roshan Kumar Patra",
+    "role": "EMPLOYEE",
+    "designation": "Employee",
+    "department": "Software Engineer ",
+    "email": "roshan@company.com",
+    "password": "Password@123",
+    "createdAt": "2026-10-13T06:26:08.123Z"
+  },
+  "MGR001": {
+    "id": "MGR001",
+    "name": "Lead Manager",
+    "role": "MANAGER",
+    "designation": "Engineering Lead",
+    "department": "Management",
+    "email": "manager@company.com",
+    "password": "password123",
+    "createdAt": "2026-10-13T06:26:07.416Z"
+  },
+  "EMP109": {
+    "id": "EMP109",
+    "name": "Vikas Patel",
+    "role": "EMPLOYEE",
+    "designation": "Employee",
+    "department": "Cloud Platform",
+    "email": "vikas@company.com",
+    "password": "password123",
+    "createdAt": "2026-10-13T06:26:21.490Z"
+  },
+  "EMP200": {
+    "id": "EMP200",
+    "name": "Aarav Sharma",
+    "role": "EMPLOYEE",
+    "designation": "Employee",
+    "department": "Quality Assurance",
+    "email": "aarav@company.com",
+    "password": "mypassword",
+    "createdAt": "2026-10-13T06:34:27.938Z"
+  },
+  "EMP106": {
+    "id": "EMP106",
+    "name": "Ananya Mishra",
+    "role": "EMPLOYEE",
+    "designation": "Employee",
+    "department": "Cloud Engineering",
+    "email": "ananya@company.com",
+    "password": "pass123",
+    "createdAt": "2026-10-13T06:38:53.198Z"
+  },
+  "EMP110": {
+    "id": "EMP110",
+    "name": "Ayush Kumar",
+    "role": "EMPLOYEE",
+    "designation": "Employee",
+    "department": "Store manager",
+    "email": "ayush@gmail.com",
+    "password": "123456",
+    "createdAt": "2026-10-13T07:22:41.073Z"
+  }
+}
